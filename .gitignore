@@ -6,6 +6,7 @@ __pycache__/
 # Generated: rebuild with `python -m revintel all`
 data/processed/usage_events.csv.gz
 data/processed/reference_kpis/account_day.csv.gz
+data/processed/spark/
 salesforce/data/
 
 # Salesforce CLI local state

@@ -1,0 +1,92 @@
+# Local stack: everything that runs outside Fabric, plus a Kusto emulator standing in
+# for the Eventhouse.  `docker compose up --build` runs it end to end:
+#
+#   usage-generator ─► (shared volume) ─► kusto ◄─ kql-init (tables, KPI functions, ingest, checks)
+#                                    └─► transform (Spark account-by-day, checked vs reference)
+#   kpi-api (usage KPIs from kusto, CRM KPIs from reference) ◄─ question-api (Claude, grounded answers)
+#
+# Salesforce loading is opt-in:  SF_AUTH_URL=... docker compose --profile salesforce run --rm salesforce-loader
+# The Kusto emulator is Microsoft's (x86-64 only) and needs ACCEPT_EULA=Y.
+
+name: revintel
+
+x-data-env: &data-env
+  REVINTEL_RAW_DIR: /data/raw
+  REVINTEL_PROCESSED_DIR: /data/processed
+
+x-kusto-env: &kusto-env
+  KUSTO_URL: http://kusto:8080
+  KUSTO_DATABASE: NetDefaultDB
+  KUSTO_AUTH: none
+  KUSTO_INGEST_MODE: command
+  KUSTO_FILE_ROOT: /kustodata
+
+services:
+  usage-generator:
+    build: { context: ., dockerfile: services/usage-generator/Dockerfile }
+    image: revintel/usage-generator:local
+    environment:
+      <<: *data-env
+      USAGE_SINKS: file
+    volumes: [processed:/data/processed]
+
+  kusto:
+    image: mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
+    environment:
+      ACCEPT_EULA: "Y"
+    ports: ["8080:8080"]
+    volumes: [processed:/kustodata:ro]
+    depends_on:
+      usage-generator: { condition: service_completed_successfully }
+
+  kql-init:
+    build: { context: ., dockerfile: services/kql-init/Dockerfile }
+    image: revintel/kql-init:local
+    command: ["all"]
+    environment:
+      <<: [*data-env, *kusto-env]
+    volumes: [processed:/data/processed]
+    depends_on:
+      kusto: { condition: service_started }
+
+  transform:
+    build: { context: ., dockerfile: services/transform/Dockerfile }
+    image: revintel/transform:local
+    command: ["--check"]
+    environment: *data-env
+    volumes: [processed:/data/processed]
+    depends_on:
+      usage-generator: { condition: service_completed_successfully }
+
+  kpi-api:
+    build: { context: ., dockerfile: services/kpi-api/Dockerfile }
+    image: revintel/kpi-api:local
+    environment:
+      <<: [*data-env, *kusto-env]
+      KPI_BACKEND: hybrid
+    ports: ["8000:8000"]
+    volumes: [processed:/data/processed:ro]
+    depends_on:
+      kql-init: { condition: service_completed_successfully }
+
+  question-api:
+    build: { context: ., dockerfile: services/question-api/Dockerfile }
+    image: revintel/question-api:local
+    environment:
+      KPI_API_URL: http://kpi-api:8000
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-5-5}
+    ports: ["8001:8000"]
+    depends_on:
+      kpi-api: { condition: service_healthy }
+
+  salesforce-loader:
+    profiles: ["salesforce"]
+    build: { context: ., dockerfile: services/salesforce-loader/Dockerfile }
+    image: revintel/salesforce-loader:local
+    environment:
+      SF_AUTH_URL: ${SF_AUTH_URL:-}
+      SF_MAX_OPPORTUNITIES: ${SF_MAX_OPPORTUNITIES:-2000}
+
+volumes:
+  processed: {}

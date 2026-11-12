@@ -20,12 +20,7 @@ import pandas as pd
 
 from . import kpis, maven, salesforce_prep, usage
 
-ROOT = Path(__file__).resolve().parents[2]
-RAW = ROOT / "data" / "raw"
-PROCESSED = ROOT / "data" / "processed"
-USAGE_FILE = PROCESSED / "usage_events.csv.gz"
-REF_DIR = PROCESSED / "reference_kpis"
-SF_DIR = ROOT / "salesforce" / "data"
+from .paths import PROCESSED, RAW, REF_DIR, SF_DIR, USAGE_FILE
 
 # KPI name -> (key columns, value columns) for `check`.
 CHECKS = {
@@ -37,6 +32,8 @@ CHECKS = {
     "win_rate_by_product": (["quarter", "product"], ["won", "closed", "win_rate"]),
     "sales_cycle_by_product": (["quarter", "product"], ["median_cycle_days"]),
     "open_pipeline_weekly": (["as_of", "regional_office", "product"], ["open_pipeline", "open_deals"]),
+    "account_day": (["account_key", "day"], ["active_arr", "primary_tier", "events", "units", "active_users", "features_used"]),
+    "consumption_by_tier": (["day", "primary_tier"], ["units", "accounts", "units_per_active_account"]),
 }
 
 
@@ -110,7 +107,7 @@ def compare(name: str, ref: pd.DataFrame, other: pd.DataFrame, rtol: float = 1e-
     for df in (ref, other):
         df.columns = [c.lower() for c in df.columns]
         for k in keys:
-            if any(t in k for t in ("day", "week", "date", "month_end", "as_of")):
+            if k in ("day", "week", "date", "month_end", "as_of"):
                 df[k] = pd.to_datetime(df[k]).dt.tz_localize(None).dt.normalize()
             else:
                 df[k] = df[k].astype(str)
@@ -122,7 +119,8 @@ def compare(name: str, ref: pd.DataFrame, other: pd.DataFrame, rtol: float = 1e-
     both = m[m["_merge"] == "both"]
     for v in values:
         a, b = both[f"{v}_ref"], both[f"{v}_other"]
-        if a.dtype == bool or b.dtype == bool or a.dtype == object:
+        numeric = all(pd.api.types.is_numeric_dtype(x) and not pd.api.types.is_bool_dtype(x) for x in (a, b))
+        if not numeric:
             bad = a.astype(str).str.lower() != b.astype(str).str.lower()
         else:
             bad = ~pd.Series(abs(a.astype(float) - b.astype(float)) <= atol + rtol * abs(a.astype(float)), index=both.index)
@@ -131,9 +129,14 @@ def compare(name: str, ref: pd.DataFrame, other: pd.DataFrame, rtol: float = 1e-
     return problems
 
 
+def read_reference(kpi: str) -> pd.DataFrame:
+    gz = REF_DIR / f"{kpi}.csv.gz"
+    return pd.read_csv(gz if gz.exists() else REF_DIR / f"{kpi}.csv")
+
+
 def cmd_check(args) -> None:
-    ref = pd.read_csv(REF_DIR / f"{args.kpi}.csv")
-    other = pd.read_csv(args.file)
+    ref = read_reference(args.kpi)
+    other = pd.read_parquet(args.file) if args.file.suffix == ".parquet" or args.file.is_dir() else pd.read_csv(args.file)
     problems = compare(args.kpi, ref, other)
     if problems:
         print(f"{args.kpi}: MISMATCH\n  " + "\n  ".join(problems))
