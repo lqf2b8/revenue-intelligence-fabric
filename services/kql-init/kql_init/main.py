@@ -21,7 +21,13 @@ from revintel import catalog, kusto
 from revintel.cli import compare, read_reference
 from revintel.paths import USAGE_FILE
 
-SCRIPTS = Path(os.environ.get("KQL_SCRIPTS_DIR", Path(__file__).resolve().parents[3] / "kql"))
+def _scripts_dir() -> Path:
+    if "KQL_SCRIPTS_DIR" in os.environ:  # set in the container image
+        return Path(os.environ["KQL_SCRIPTS_DIR"])
+    return Path(__file__).resolve().parents[3] / "kql"  # repo checkout
+
+
+SCRIPTS = _scripts_dir()
 DEFAULT_SCRIPTS = ["01_tables.kql", "02_kpi_functions.kql"]
 
 
