@@ -1,0 +1,31 @@
+// 01_tables.kql — create the usage table and its CSV mapping.
+// Run once per database: on the free Azure Data Explorer cluster in Phase 0,
+// then in the Fabric Eventhouse's KQL database in Phase 1. Run each command separately.
+//
+// Data: data/processed/usage_events.csv.gz (SYNTHETIC, made by `python -m revintel usage`).
+// Load it with the web UI: Get data > Local file > existing table UsageEvents >
+// format CSV, "first row is header", mapping UsageEventsCsv.
+
+.create-merge table UsageEvents (
+    Day: datetime,
+    AccountKey: string,
+    UserId: string,
+    Feature: string,
+    Events: long,
+    Units: real
+) with (docstring = "SYNTHETIC daily product usage per account, user and feature. See README.", folder = "usage")
+
+.create-or-alter table UsageEvents ingestion csv mapping "UsageEventsCsv"
+```
+[
+  {"column": "Day",        "Properties": {"Ordinal": "0"}},
+  {"column": "AccountKey", "Properties": {"Ordinal": "1"}},
+  {"column": "UserId",     "Properties": {"Ordinal": "2"}},
+  {"column": "Feature",    "Properties": {"Ordinal": "3"}},
+  {"column": "Events",     "Properties": {"Ordinal": "4"}},
+  {"column": "Units",      "Properties": {"Ordinal": "5"}}
+]
+```
+
+// After loading, these should match data/processed/usage_events.csv.gz:
+// UsageEvents | summarize Rows = count(), Accounts = dcount(AccountKey), FirstDay = min(Day), LastDay = max(Day), Units = round(sum(Units), 2)

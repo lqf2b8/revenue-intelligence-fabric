@@ -1,0 +1,66 @@
+// 02_kpi_functions.kql — usage KPIs as stored functions.
+// Each function mirrors a function in src/revintel/kpis.py, and its output columns
+// match the reference CSV in data/processed/reference_kpis/ so `python -m revintel check`
+// can compare them. Run each command separately.
+//
+// Parameters N (adoption) and X (expansion signal) default to the values in
+// reference_kpis/params.json. Change them in one place: the semantic model, the
+// reference params and these defaults must agree.
+
+.create-or-alter function with (folder = "kpi", docstring = "Accounts with at least one usage event in the trailing windowDays days, inclusive of the day")
+ActiveAccounts(windowDays: int = 28) {
+    let lastDay = toscalar(UsageEvents | summarize max(Day));
+    UsageEvents
+    | distinct AccountKey, Day
+    | mv-expand day = range(Day, Day + (windowDays - 1) * 1d, 1d) to typeof(datetime)
+    | where day <= lastDay
+    | distinct day, AccountKey
+    | summarize active_accounts = count() by day
+    | order by day asc
+}
+
+.create-or-alter function with (folder = "kpi", docstring = "Metered units per day, and units per account with usage that day")
+ConsumptionDaily() {
+    UsageEvents
+    | summarize units = sum(Units) by day = Day, AccountKey
+    | summarize units = sum(units), accounts = count() by day
+    | extend units_per_active_account = units / accounts
+    | order by day asc
+}
+
+.create-or-alter function with (folder = "kpi", docstring = "Share of accounts active in the week (Monday start) that used at least minFeatures distinct features that week")
+Adoption(minFeatures: int = 4) {
+    UsageEvents
+    // startofweek() starts on Sunday; shifting by a day gives Monday-start weeks like the reference.
+    | extend week = startofweek(Day - 1d) + 1d
+    | distinct week, AccountKey, Feature
+    | summarize features = count() by week, AccountKey
+    | summarize active_accounts = count(), adopted = countif(features >= minFeatures) by week
+    | extend adoption_rate = todouble(adopted) / active_accounts
+    | order by week asc
+}
+
+.create-or-alter function with (folder = "kpi", docstring = "Per account at each month-end: units in the last windowDays days vs the prior windowDays days; signal when the rise exceeds risePct")
+ExpansionSignal(risePct: real = 0.10, windowDays: int = 28) {
+    let daily = UsageEvents | summarize Units = sum(Units) by AccountKey, Day;
+    let firstSeen = daily | summarize FirstDay = min(Day) by AccountKey;
+    let firstDay = toscalar(daily | summarize min(Day));
+    let lastDay = toscalar(daily | summarize max(Day));
+    let monthEnds = range d from startofday(firstDay) to lastDay step 1d
+        | where startofday(endofmonth(d)) == d
+        | project month_end = d, k = 1;
+    monthEnds
+    | join kind=inner (firstSeen | extend k = 1) on k
+    // Score an account only once it has two full windows of history.
+    | where FirstDay <= month_end - (2 * windowDays - 1) * 1d
+    | join kind=leftouter daily on AccountKey
+    // Keep every eligible account-month, even one with no usage in either window.
+    | extend Units = iff(Day > month_end - 2 * windowDays * 1d and Day <= month_end, Units, 0.0)
+    | summarize units_last28 = sumif(Units, Day > month_end - windowDays * 1d),
+                units_prior28 = sumif(Units, Day <= month_end - windowDays * 1d)
+        by month_end, account_key = AccountKey
+    | extend growth = iff(units_prior28 > 0, units_last28 / units_prior28 - 1, real(null))
+    | extend signal = units_prior28 > 0 and growth > risePct
+    | project month_end, account_key, units_last28 = round(units_last28, 2), units_prior28 = round(units_prior28, 2), growth, signal
+    | order by month_end asc, account_key asc
+}

@@ -1,0 +1,23 @@
+// 03_checks.kql — run each query, export the result to CSV (web UI: Export > CSV),
+// then compare with the reference numbers from the repo root:
+//
+//   python -m revintel check active_accounts   active_accounts_kql.csv
+//   python -m revintel check consumption_daily consumption_daily_kql.csv
+//   python -m revintel check adoption          adoption_kql.csv
+//   python -m revintel check expansion_signal  expansion_signal_kql.csv
+//
+// A pass means the KQL definition and the Python reference agree to the cent.
+// A mismatch prints the first differing rows.
+
+ActiveAccounts()
+
+ConsumptionDaily()
+
+Adoption()
+
+ExpansionSignal()
+
+// Sanity: the planted effect. Signal accounts should be roughly twice as likely to
+// book an expansion month next month. That needs CRM data, so it's checked in
+// Python (reference_kpis/signal_vs_next_month_expansion.csv) and later in the
+// semantic model, not here.

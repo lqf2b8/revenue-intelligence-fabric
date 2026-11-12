@@ -1,0 +1,54 @@
+{
+  "seed": 20261113,
+  "seat_rate": 0.01,
+  "min_seats": 5,
+  "max_seats": 60,
+  "base_active_p": 0.55,
+  "weekend_factor": 0.25,
+  "holiday_factor": 0.4,
+  "onboarding_tau": 30.0,
+  "health_sigma": 0.2,
+  "events_mean": 3.0,
+  "units_shape": 4.0,
+  "lift": 0.35,
+  "ramp_days": 28,
+  "decay_days": 14,
+  "features": {
+    "dashboards": [
+      0.85,
+      1.0,
+      1.0,
+      0
+    ],
+    "reports": [
+      0.5,
+      2.0,
+      0.9,
+      20
+    ],
+    "alerts": [
+      0.35,
+      0.5,
+      0.7,
+      45
+    ],
+    "api": [
+      0.25,
+      5.0,
+      0.5,
+      60
+    ],
+    "workflows": [
+      0.2,
+      3.0,
+      0.45,
+      90
+    ],
+    "ai_assist": [
+      0.12,
+      8.0,
+      0.35,
+      120
+    ]
+  }
+}

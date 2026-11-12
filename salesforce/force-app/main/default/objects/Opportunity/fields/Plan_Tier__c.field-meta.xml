@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Plan_Tier__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Product sold, treated as a subscription plan tier.</description>
+    <label>Plan Tier</label>
+    <referenceTo>Product2</referenceTo>
+    <relationshipLabel>Opportunities (Plan Tier)</relationshipLabel>
+    <relationshipName>Plan_Tier_Opportunities</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

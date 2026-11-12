@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Maven_Account_Key__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Key from the Maven CRM extract; shared with the usage data as AccountKey.</description>
+    <externalId>true</externalId>
+    <label>Maven Account Key</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

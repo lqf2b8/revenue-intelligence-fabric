@@ -1,0 +1,5 @@
+{
+  "adoption_min_features": 4,
+  "expansion_rise": 0.1,
+  "active_window_days": 28
+}

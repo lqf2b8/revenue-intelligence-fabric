@@ -1,0 +1,13 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/
+
+# Generated: rebuild with `python -m revintel all`
+data/processed/usage_events.csv.gz
+data/processed/reference_kpis/account_day.csv.gz
+salesforce/data/
+
+# Salesforce CLI local state
+salesforce/.sf/
+salesforce/.sfdx/

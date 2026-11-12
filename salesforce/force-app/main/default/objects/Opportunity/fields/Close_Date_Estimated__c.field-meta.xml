@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Close_Date_Estimated__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>True for open deals: the extract has no close date, so CloseDate is a placeholder.</description>
+    <label>Close Date Estimated</label>
+    <type>Checkbox</type>
+</CustomField>
