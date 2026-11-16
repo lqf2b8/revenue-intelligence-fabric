@@ -7,6 +7,8 @@
 #
 # Salesforce loading is opt-in:  SF_AUTH_URL=... docker compose --profile salesforce run --rm salesforce-loader
 # The Kusto emulator is Microsoft's (x86-64 only) and needs ACCEPT_EULA=Y.
+# Host ports default to 8080 (kusto), 8000 (kpi-api), 8001 (question-api); override with
+# KUSTO_PORT, KPI_API_PORT, QUESTION_API_PORT (in your shell or a .env file) if they're taken.
 
 name: revintel
 
@@ -34,7 +36,7 @@ services:
     image: mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
     environment:
       ACCEPT_EULA: "Y"
-    ports: ["8080:8080"]
+    ports: ["${KUSTO_PORT:-8080}:8080"]
     volumes: [processed:/kustodata:ro]
     depends_on:
       usage-generator: { condition: service_completed_successfully }
@@ -53,7 +55,11 @@ services:
     build: { context: ., dockerfile: services/transform/Dockerfile }
     image: revintel/transform:local
     command: ["--check"]
-    environment: *data-env
+    environment:
+      <<: *data-env
+      # PySpark warns on every pandas conversion that pandas 3 isn't fully supported;
+      # the --check step verifies the output, so silence the noise.
+      PYTHONWARNINGS: ignore::FutureWarning
     volumes: [processed:/data/processed]
     depends_on:
       usage-generator: { condition: service_completed_successfully }
@@ -64,7 +70,7 @@ services:
     environment:
       <<: [*data-env, *kusto-env]
       KPI_BACKEND: hybrid
-    ports: ["8000:8000"]
+    ports: ["${KPI_API_PORT:-8000}:8000"]
     volumes: [processed:/data/processed:ro]
     depends_on:
       kql-init: { condition: service_completed_successfully }
@@ -76,7 +82,7 @@ services:
       KPI_API_URL: http://kpi-api:8000
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-5-5}
-    ports: ["8001:8000"]
+    ports: ["${QUESTION_API_PORT:-8001}:8000"]
     depends_on:
       kpi-api: { condition: service_healthy }
 
