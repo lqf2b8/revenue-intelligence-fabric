@@ -1,7 +1,7 @@
 import pandas as pd
 
 from revintel import maven
-from conftest import RAW
+from revintel.paths import RAW
 
 
 def test_shape_and_stages(data):

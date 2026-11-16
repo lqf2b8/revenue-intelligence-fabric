@@ -1,7 +1,8 @@
 # Revenue Intelligence on Microsoft Fabric
 
-> **Status: in progress.** Data foundation, synthetic usage, Salesforce load and draft KQL KPIs are done.
-> The Fabric build (Lakehouse, Eventhouse, Spark, semantic model, Power BI, question layer) is next.
+> **Status: in progress.** Data foundation, synthetic usage, Salesforce loader, KQL KPIs, Spark transform,
+> KPI API and question layer run as Docker services, tested in CI against a Kusto emulator.
+> The Fabric build (Lakehouse, Eventhouse, semantic model, Power BI) is next.
 > Target ship date: December 2, 2026.
 
 This project builds a governed revenue analytics layer for a made-up B2B software company. It joins **CRM
@@ -70,12 +71,49 @@ defaults and the semantic model, and nowhere else.
 **Plan tier for usage.** An account can hold several plan tiers at once. For tier breakdowns of usage,
 each account-day takes the tier with the most active ARR (`primary_tier` on the account-by-day table).
 
-## Quickstart
+## Services
+
+Fabric is the system of record. Everything that runs outside it is a small, single-purpose service with its
+own Docker image, sharing one library (`src/revintel`) and one KPI catalog
+([`src/revintel/catalog.py`](src/revintel/catalog.py)).
+
+| Service | Kind | What it does | Fabric counterpart |
+|---|---|---|---|
+| [`usage-generator`](services/usage-generator) | job | Synthetic usage + reference KPI tables; sinks: file, Kusto, or an Event Hub / Eventstream replay | Feeds the Eventhouse |
+| [`kql-init`](services/kql-init) | job | Creates tables and KPI functions, ingests usage, checks every KQL KPI against the reference | Same scripts run on the Eventhouse |
+| [`transform`](services/transform) | job | PySpark account-by-day table and consumption by tier, checked against the reference | Same functions run in a Fabric notebook |
+| [`salesforce-loader`](services/salesforce-loader) | job | Deploys fields, upserts the CRM sample into a Salesforce org | Source for Fabric's Salesforce connector |
+| [`kpi-api`](services/kpi-api) | API | Serves every catalog KPI. Backends: `reference`, `kusto`, `fabric` (DAX on the semantic model), `hybrid` | Reads the semantic model in Phase 1 |
+| [`question-api`](services/question-api) | API | Claude with two tools (`list_kpis`, `get_kpi`) on the KPI API. Answers that contain a number no KPI returned are retried once, then refused. | Question layer |
+
+The question layer never sees a database. It reaches data only through the KPI API, so switching
+`KPI_BACKEND` to `fabric` moves every answer onto the semantic model's definitions without changing it.
+
+```
+usage-generator ─► shared volume ─► kusto (emulator) ◄─ kql-init: tables, functions, ingest, checks
+                              └──► transform (Spark): account-by-day, checked
+kpi-api: usage KPIs from kusto, CRM KPIs from reference ◄─ question-api (Claude, grounded answers)
+```
 
 ```bash
-pip install -e ".[dev]"
+docker compose up --build                       # whole stack, in dependency order
+curl "localhost:8000/kpis/active_accounts?start=2017-12-31&end=2017-12-31"
+ANTHROPIC_API_KEY=... docker compose up -d question-api
+curl -X POST localhost:8001/ask -H 'content-type: application/json' \
+     -d '{"question": "How did win rate for GTX Pro change across 2017?"}'
+SF_AUTH_URL=... docker compose --profile salesforce run --rm salesforce-loader
+```
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the unit tests, Spark included, then builds
+every image. It runs the stack against Microsoft's Kusto emulator: every KQL KPI must match the reference,
+the Spark output must match the reference, and the APIs are smoke-tested.
+
+## Quickstart (without Docker)
+
+```bash
+pip install -e ".[all]"    # Spark tests also need Java 17+
 python -m revintel all     # usage events + Salesforce CSVs + reference KPI tables
-pytest                     # 31 tests, ~7 s
+pytest                     # 58 tests, ~30 s
 ```
 
 | Command | Output |
@@ -124,9 +162,12 @@ row counts and storage used. Relationships resolve by key (`Account.Maven_Accoun
 ## Repo layout
 
 ```
-src/revintel/   maven.py (load + clean)  subscriptions.py (reframing)  usage.py (generator)
-                kpis.py (reference KPIs)  salesforce_prep.py  cli.py
-tests/          31 pytest checks, including planted-effect recovery and a lift = 0 control
+src/revintel/   shared library: maven.py (load + clean)  subscriptions.py (reframing)  usage.py (generator)
+                kpis.py (reference KPIs)  catalog.py (KPI catalog)  kusto.py  salesforce_prep.py  cli.py
+services/       one folder per service: code + Dockerfile
+docker-compose.yml   local stack with the Kusto emulator
+tests/          58 pytest checks: planted-effect recovery and a lift = 0 control, Spark vs reference,
+                KPI API, grounding and the question agent (scripted model)
 kql/            table setup, KPI functions, checks
 salesforce/     custom fields, permission set, load script
 fabric/         Fabric workspace items (Phase 1)
@@ -136,9 +177,10 @@ data/raw/       Maven CSVs (unchanged)    data/processed/  generated outputs
 ## Roadmap
 
 - [x] Phase 0: data cleaning, reframing, usage generator, reference KPIs, Salesforce load, KQL drafts
+- [x] Services and Docker stack: KQL checked on the Kusto emulator, Spark transform matched to the reference,
+      KPI API, question layer with grounding check, CI
 - [ ] Fabric: Lakehouse + Salesforce connector, Eventhouse, Git integration
-- [ ] Spark notebooks: account-by-day table, matched to the reference
-- [ ] Semantic model: one measure per KPI, matched to the reference
+- [ ] Spark notebook in Fabric calling `transform.jobs`
+- [ ] Semantic model: one measure per KPI, matched to the reference; point `kpi-api` at it (`KPI_BACKEND=fabric`)
 - [ ] Power BI report
-- [ ] Question layer that answers only from semantic-model measures
 - [ ] Scheduled refresh, screenshots, 5-minute walkthrough video (the Fabric trial ends after 60 days)

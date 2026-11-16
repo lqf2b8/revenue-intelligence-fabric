@@ -6,7 +6,13 @@ requires-python = ">=3.10"
 dependencies = ["pandas>=2.1", "numpy>=1.26"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "httpx>=0.27"]
+kusto = ["azure-kusto-data>=5", "azure-kusto-ingest>=5"]
+eventhub = ["azure-eventhub>=5.11"]
+api = ["fastapi>=0.110", "uvicorn>=0.29", "httpx>=0.27", "azure-identity>=1.15"]
+question = ["fastapi>=0.110", "uvicorn>=0.29", "httpx>=0.27", "anthropic>=0.40"]
+spark = ["pyspark>=3.5", "pyarrow>=15"]
+all = ["revintel[dev,kusto,eventhub,api,question,spark]"]
 
 [project.scripts]
 revintel = "revintel.cli:main"
@@ -20,4 +26,12 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src", "tests"]
+pythonpath = ["src", "tests", "services/usage-generator", "services/kql-init", "services/kpi-api", "services/question-api", "services/transform"]
+markers = ["spark: needs pyspark and a JVM (slow)"]
+filterwarnings = [
+    "error",
+    # PySpark internals: py4j sockets and pandas deprecations raised inside pyspark
+    "ignore:::pyspark",
+    "ignore::ResourceWarning",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+]

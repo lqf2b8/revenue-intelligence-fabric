@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: unit tests (incl. Spark)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: pip install -e ".[all]"
+      - run: python -m revintel all
+      - run: pytest -q
+
+  stack:
+    name: docker stack + Kusto emulator
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose build
+      - name: Generate usage + reference KPIs
+        run: docker compose run --rm usage-generator
+      - name: Start Kusto emulator
+        run: docker compose up -d --no-deps kusto
+      - name: KQL tables, functions, ingest, KPI checks vs reference
+        run: docker compose run --rm --no-deps kql-init all
+      - name: Spark transform, checked vs reference
+        run: docker compose run --rm --no-deps transform --check
+      - name: Start APIs
+        run: docker compose up -d --no-deps --wait kpi-api question-api
+      - name: Smoke test APIs
+        run: |
+          set -euo pipefail
+          curl -fsS localhost:8000/health | tee /dev/stderr | jq -e '.backend == "hybrid"'
+          curl -fsS localhost:8000/kpis | jq -e '[.kpis[] | select(.name == "active_accounts")][0].served_by == "kusto"'
+          curl -fsS localhost:8000/kpis | jq -e '[.kpis[] | select(.name == "arr_monthly")][0].served_by == "reference"'
+          curl -fsS "localhost:8000/kpis/active_accounts?start=2017-12-31&end=2017-12-31" | tee /dev/stderr \
+            | jq -e '.rows[0].active_accounts == 85'
+          curl -fsS "localhost:8000/kpis/adoption?start=2017-12-11&end=2017-12-11" | jq -e '.rows | length == 1'
+          curl -fsS localhost:8001/health | jq -e '.status == "ok"'
+          # No API key in CI: /ask must say it's not configured rather than crash.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST localhost:8001/ask \
+            -H 'content-type: application/json' -d '{"question":"What was ARR in December 2017?"}')" = 503
+      - name: Logs
+        if: always()
+        run: docker compose logs --no-color --tail 200
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

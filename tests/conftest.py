@@ -1,11 +1,9 @@
 from dataclasses import replace
-from pathlib import Path
-
 import pytest
 
 from revintel import maven, usage
+from revintel.paths import RAW
 
-RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 
 
 @pytest.fixture(scope="session")
