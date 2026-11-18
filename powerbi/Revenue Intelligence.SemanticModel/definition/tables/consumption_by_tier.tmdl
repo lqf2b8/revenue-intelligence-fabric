@@ -1,0 +1,68 @@
+table consumption_by_tier
+	lineageTag: 7d4c7b38-9c16-4a8c-8bca-4314908e0ce0
+
+	column day
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4a7b8e13-8c87-463e-ab74-116248206293
+		summarizeBy: none
+		sourceColumn: day
+
+		variation Variation
+			isDefault
+			relationship: 2a238288-cac5-4cbf-aee4-561280422d28
+			defaultHierarchy: LocalDateTable_0ff02967-22f2-421b-8c26-4e08a79f9328.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column primary_tier
+		dataType: string
+		lineageTag: 66705415-d8aa-48d9-ac42-3ce9940cfd3b
+		summarizeBy: none
+		sourceColumn: primary_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column units
+		dataType: double
+		lineageTag: de2710ed-e4d9-444a-9423-f3e64bced742
+		summarizeBy: sum
+		sourceColumn: units
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: dab2e829-bd48-4bbd-b966-f325b5ed6528
+		summarizeBy: sum
+		sourceColumn: accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	column units_per_active_account
+		dataType: double
+		lineageTag: 3c7295db-5c5a-41f5-9de6-bdfb84bd50b7
+		summarizeBy: sum
+		sourceColumn: units_per_active_account
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition consumption_by_tier = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/consumption_by_tier.csv"),[Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"day", type date}, {"primary_tier", type text}, {"units", type number}, {"accounts", Int64.Type}, {"units_per_active_account", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

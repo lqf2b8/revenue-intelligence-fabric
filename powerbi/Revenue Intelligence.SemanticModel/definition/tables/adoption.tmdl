@@ -1,0 +1,65 @@
+table adoption
+	lineageTag: 3fa0ac36-460b-478e-b8f0-be1b905bf03a
+
+	measure 'Adoption (latest week)' =
+			
+			VAR w = MAX ( adoption[week] )
+			RETURN CALCULATE ( DIVIDE ( SUM ( adoption[adopted] ), SUM ( adoption[active_accounts] ) ), adoption[week] = w )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 04333cfb-58f3-4a77-9cc3-3d64a007670d
+
+	column week
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b47cace6-7a36-44f5-94b9-87c8676e3e22
+		summarizeBy: none
+		sourceColumn: week
+
+		variation Variation
+			isDefault
+			relationship: c7499345-b3b0-42f3-a75b-83ecaff2af9b
+			defaultHierarchy: LocalDateTable_8ef11006-65ac-457f-b30a-8b537a5609e8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column active_accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e504f57-9c17-43e8-b4f1-9f7d6f30bd9c
+		summarizeBy: sum
+		sourceColumn: active_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	column adopted
+		dataType: int64
+		formatString: 0
+		lineageTag: f4cf840d-f799-4e7e-aac4-643b8a83cfdb
+		summarizeBy: sum
+		sourceColumn: adopted
+
+		annotation SummarizationSetBy = Automatic
+
+	column adoption_rate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: a7e7fe5d-fd8d-4c1d-bb65-da55b56fbed5
+		summarizeBy: sum
+		sourceColumn: adoption_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition adoption = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/adoption.csv"),[Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"week", type date}, {"active_accounts", Int64.Type}, {"adopted", Int64.Type}, {"adoption_rate", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,16 @@
+{
+  "name": "Revenue Intelligence",
+  "dataColors": ["#2E6FD8", "#E07B39", "#3A9E6F", "#8B5CC4", "#D4A72C", "#4BA3C3", "#C4506A", "#7A8A99"],
+  "background": "#FFFFFF",
+  "foreground": "#1F2933",
+  "tableAccent": "#2E6FD8",
+  "good": "#3A9E6F",
+  "neutral": "#D4A72C",
+  "bad": "#C4506A",
+  "textClasses": {
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#1F2933" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#1F2933" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#52606D" },
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#1F2933" }
+  }
+}

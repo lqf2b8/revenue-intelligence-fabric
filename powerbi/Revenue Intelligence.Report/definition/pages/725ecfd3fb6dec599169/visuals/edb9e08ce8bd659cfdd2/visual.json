@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "edb9e08ce8bd659cfdd2",
+  "position": {
+    "x": 648,
+    "y": 56,
+    "z": 2,
+    "height": 110,
+    "width": 616,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "adoption"
+                    }
+                  },
+                  "Property": "Adoption (latest week)"
+                }
+              },
+              "queryRef": "adoption.Adoption (latest week)",
+              "nativeQueryRef": "Adoption (latest week)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Adoption, latest week (4+ of 6 features)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

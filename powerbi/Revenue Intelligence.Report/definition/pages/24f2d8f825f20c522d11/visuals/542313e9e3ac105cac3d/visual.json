@@ -1,0 +1,164 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "542313e9e3ac105cac3d",
+  "position": {
+    "x": 16,
+    "y": 392,
+    "z": 3,
+    "height": 312,
+    "width": 1248,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "expansion_signal"
+                    }
+                  },
+                  "Property": "month_end"
+                }
+              },
+              "queryRef": "expansion_signal.month_end",
+              "nativeQueryRef": "month_end"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "expansion_signal"
+                    }
+                  },
+                  "Property": "account_key"
+                }
+              },
+              "queryRef": "expansion_signal.account_key",
+              "nativeQueryRef": "account_key"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "expansion_signal"
+                        }
+                      },
+                      "Property": "growth"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(expansion_signal.growth)",
+              "nativeQueryRef": "Sum of growth"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "expansion_signal"
+                    }
+                  },
+                  "Property": "signal"
+                }
+              },
+              "queryRef": "expansion_signal.signal",
+              "nativeQueryRef": "signal"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Accounts flagged by the expansion signal, by month-end'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "61258ffd8c91a1a2a4e2",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "expansion_signal"
+              }
+            },
+            "Property": "signal"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "e",
+              "Entity": "expansion_signal",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "e"
+                          }
+                        },
+                        "Property": "signal"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "true"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

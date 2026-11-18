@@ -1,0 +1,33 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["arr_monthly_by_tier","open_pipeline_weekly","win_rate_by_product","active_accounts","adoption","consumption_by_tier","signal_vs_next_month_expansion","expansion_signal"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table arr_monthly_by_tier
+ref table DateTableTemplate_13813803-767d-4e3a-b9a9-8d206a56d68e
+ref table LocalDateTable_115e1159-fc13-40f2-b0bd-ebda5e54a603
+ref table open_pipeline_weekly
+ref table LocalDateTable_31399dd8-4bc7-4fa5-9e47-90cd4e0b7328
+ref table win_rate_by_product
+ref table active_accounts
+ref table LocalDateTable_bbf1ff90-16da-46db-a50c-65d59a796b0e
+ref table adoption
+ref table LocalDateTable_8ef11006-65ac-457f-b30a-8b537a5609e8
+ref table consumption_by_tier
+ref table LocalDateTable_0ff02967-22f2-421b-8c26-4e08a79f9328
+ref table signal_vs_next_month_expansion
+ref table expansion_signal
+ref table LocalDateTable_96f4cea9-22b9-440d-99b1-bdd1b818c2af
+
+ref cultureInfo en-US
+

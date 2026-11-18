@@ -1,0 +1,55 @@
+table arr_monthly_by_tier
+	lineageTag: cb312825-1e80-477e-9885-72849e5e671c
+
+	measure 'ARR (latest)' =
+			
+			VAR d = MAX ( arr_monthly_by_tier[date] )
+			RETURN CALCULATE ( SUM ( arr_monthly_by_tier[arr] ), arr_monthly_by_tier[date] = d )
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 89a7539c-73b6-4333-a3fb-1b3da047eab5
+
+	column date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 768f64f6-b28c-4e50-82d2-b8262693abf3
+		summarizeBy: none
+		sourceColumn: date
+
+		variation Variation
+			isDefault
+			relationship: 5c5e7737-8912-4b46-b810-8ef6a15bed40
+			defaultHierarchy: LocalDateTable_115e1159-fc13-40f2-b0bd-ebda5e54a603.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column plan_tier
+		dataType: string
+		lineageTag: d921438e-4f93-4413-8f02-1437841106f8
+		summarizeBy: none
+		sourceColumn: plan_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column arr
+		dataType: int64
+		formatString: 0
+		lineageTag: f96a774d-e07d-4018-acc5-f10080df2d9a
+		summarizeBy: sum
+		sourceColumn: arr
+
+		annotation SummarizationSetBy = Automatic
+
+	partition arr_monthly_by_tier = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/arr_monthly_by_tier.csv"),[Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"date", type date}, {"plan_tier", type text}, {"arr", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

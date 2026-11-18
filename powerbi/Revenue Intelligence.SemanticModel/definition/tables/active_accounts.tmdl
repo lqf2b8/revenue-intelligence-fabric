@@ -1,0 +1,47 @@
+table active_accounts
+	lineageTag: 1035a6ec-59f0-46ec-b655-52a81c849d54
+
+	measure 'Active accounts (latest)' =
+			
+			VAR d = MAX ( active_accounts[day] )
+			RETURN CALCULATE ( SUM ( active_accounts[active_accounts] ), active_accounts[day] = d )
+		formatString: 0
+		lineageTag: 702c7bcd-cb62-4e41-ad4b-c75e35f925d1
+
+	column day
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0d764909-776b-48d5-85d3-92fbdea8481e
+		summarizeBy: none
+		sourceColumn: day
+
+		variation Variation
+			isDefault
+			relationship: ec1531c5-d885-4109-ac35-b28e4fc2df21
+			defaultHierarchy: LocalDateTable_bbf1ff90-16da-46db-a50c-65d59a796b0e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column active_accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: 21c1619e-3a50-425b-8b9d-5439591a1a8d
+		summarizeBy: sum
+		sourceColumn: active_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	partition active_accounts = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/active_accounts.csv"),[Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"day", type date}, {"active_accounts", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

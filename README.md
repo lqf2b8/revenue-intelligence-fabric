@@ -2,7 +2,8 @@
 
 > **Status: in progress.** Data foundation, synthetic usage, Salesforce loader, KQL KPIs, Spark transform,
 > KPI API and question layer run as Docker services, tested in CI against a Kusto emulator.
-> The Fabric build (Lakehouse, Eventhouse, semantic model, Power BI) is next.
+> A first Power BI report is live: [Power BI wireframe](https://app.powerbi.com/view?r=eyJrIjoiZjUwYjkwMDctMTA3MS00YmZmLTkzNWItNDE0MDEzYmE4ZDJmIiwidCI6IjI2MWI2NDMxLTk1OTgtNDQzMi1hYmNiLTNhZGIwMThhNjdkZSJ9) ([`powerbi/`](powerbi)).
+> The Fabric build (Lakehouse, Eventhouse, semantic model) is next.
 > Target ship date: December 2, 2026.
 
 This project builds a governed revenue analytics layer for a made-up B2B software company. It joins **CRM
@@ -171,6 +172,7 @@ tests/          58 pytest checks: planted-effect recovery and a lift = 0 control
 kql/            table setup, KPI functions, checks
 salesforce/     custom fields, permission set, load script
 fabric/         Fabric workspace items (Phase 1)
+powerbi/        Power BI project (PBIR + TMDL) for the published wireframe
 data/raw/       Maven CSVs (unchanged)    data/processed/  generated outputs
 ```
 
@@ -182,5 +184,6 @@ data/raw/       Maven CSVs (unchanged)    data/processed/  generated outputs
 - [ ] Fabric: Lakehouse + Salesforce connector, Eventhouse, Git integration
 - [ ] Spark notebook in Fabric calling `transform.jobs`
 - [ ] Semantic model: one measure per KPI, matched to the reference; point `kpi-api` at it (`KPI_BACKEND=fabric`)
-- [ ] Power BI report
+- [x] Power BI wireframe: three pages on the reference tables, published to web ([`powerbi/`](powerbi))
+- [ ] Power BI report on the semantic model, republished over the wireframe
 - [ ] Scheduled refresh, screenshots, 5-minute walkthrough video (the Fabric trial ends after 60 days)

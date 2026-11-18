@@ -1,0 +1,77 @@
+table expansion_signal
+	lineageTag: 3f11810e-bbda-48c1-8b95-ed8d00a0352b
+
+	column month_end
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 29a3cbbd-4c7c-459f-82d4-642725344065
+		summarizeBy: none
+		sourceColumn: month_end
+
+		variation Variation
+			isDefault
+			relationship: 607a31bf-265d-4961-ab2d-47e4cebaea8c
+			defaultHierarchy: LocalDateTable_96f4cea9-22b9-440d-99b1-bdd1b818c2af.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column account_key
+		dataType: string
+		lineageTag: c9014026-ffd2-4017-ad16-199147f9260a
+		summarizeBy: none
+		sourceColumn: account_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column units_last28
+		dataType: double
+		lineageTag: bfc85249-3102-4173-9f08-5101597bcbde
+		summarizeBy: sum
+		sourceColumn: units_last28
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column units_prior28
+		dataType: double
+		lineageTag: 03c80583-5286-4c5b-9c93-1f9fc19e9d67
+		summarizeBy: sum
+		sourceColumn: units_prior28
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column growth
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 56ee9bb2-7318-415d-b022-2ee1470f8e74
+		summarizeBy: sum
+		sourceColumn: growth
+
+		annotation SummarizationSetBy = Automatic
+
+	column signal
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6e1290fc-e243-4565-8c31-199ae69bd194
+		summarizeBy: none
+		sourceColumn: signal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition expansion_signal = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/expansion_signal.csv"),[Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"month_end", type date}, {"account_key", type text}, {"units_last28", type number}, {"units_prior28", type number}, {"growth", type number}, {"signal", type logical}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

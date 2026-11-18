@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5fcb4835ce864aa8e8e7",
+  "position": {
+    "x": 16,
+    "y": 8,
+    "z": 0,
+    "height": 40,
+    "width": 1248,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Wireframe · CRM: Maven sample data (public domain), reframed as SaaS · Usage: synthetic · github.com/lqf2b8/revenue-intelligence-fabric",
+                    "textStyle": {
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

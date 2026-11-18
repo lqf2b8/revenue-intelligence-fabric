@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "fe2bd6c8c73b3a6f6573",
+  "position": {
+    "x": 644,
+    "y": 180,
+    "z": 5,
+    "height": 260,
+    "width": 620,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "open_pipeline_weekly"
+                    }
+                  },
+                  "Property": "as_of"
+                }
+              },
+              "queryRef": "open_pipeline_weekly.as_of",
+              "nativeQueryRef": "as_of",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "open_pipeline_weekly"
+                    }
+                  },
+                  "Property": "regional_office"
+                }
+              },
+              "queryRef": "open_pipeline_weekly.regional_office",
+              "nativeQueryRef": "regional_office"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "open_pipeline_weekly"
+                        }
+                      },
+                      "Property": "open_pipeline"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(open_pipeline_weekly.open_pipeline)",
+              "nativeQueryRef": "Sum of open_pipeline"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "open_pipeline_weekly"
+                  }
+                },
+                "Property": "as_of"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Open pipeline by regional office, weekly'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

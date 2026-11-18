@@ -1,0 +1,72 @@
+table open_pipeline_weekly
+	lineageTag: 3bb02e26-920a-4740-936f-6658cbe8fcc9
+
+	measure 'Open pipeline (latest)' =
+			
+			VAR d = MAX ( open_pipeline_weekly[as_of] )
+			RETURN CALCULATE ( SUM ( open_pipeline_weekly[open_pipeline] ), open_pipeline_weekly[as_of] = d )
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 6f13f1b3-3cea-4b38-a632-fd9bee15a92a
+
+	column as_of
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8c93dcf2-1121-4b86-a107-8a07aa9de697
+		summarizeBy: none
+		sourceColumn: as_of
+
+		variation Variation
+			isDefault
+			relationship: 7ffabd51-d45b-4fab-8b9c-aed8e3e032d5
+			defaultHierarchy: LocalDateTable_31399dd8-4bc7-4fa5-9e47-90cd4e0b7328.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column regional_office
+		dataType: string
+		lineageTag: 9b3b0f81-e5bb-4860-b596-9b874891733b
+		summarizeBy: none
+		sourceColumn: regional_office
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: 65ff8585-33da-41f1-8fcd-77b896cd88cf
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_pipeline
+		dataType: int64
+		formatString: 0
+		lineageTag: 0bb01dc8-ef34-4868-89b2-bafeba0fd11a
+		summarizeBy: sum
+		sourceColumn: open_pipeline
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_deals
+		dataType: int64
+		formatString: 0
+		lineageTag: 97531c9b-42c7-4ff3-98b3-da4ec5bc2873
+		summarizeBy: sum
+		sourceColumn: open_deals
+
+		annotation SummarizationSetBy = Automatic
+
+	partition open_pipeline_weekly = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/open_pipeline_weekly.csv"),[Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"as_of", type date}, {"regional_office", type text}, {"product", type text}, {"open_pipeline", Int64.Type}, {"open_deals", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

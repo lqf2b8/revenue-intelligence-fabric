@@ -1,0 +1,102 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "79e41473feb8cf830d9d",
+  "position": {
+    "x": 644,
+    "y": 180,
+    "z": 4,
+    "height": 260,
+    "width": 620,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "adoption"
+                    }
+                  },
+                  "Property": "week"
+                }
+              },
+              "queryRef": "adoption.week",
+              "nativeQueryRef": "week",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "adoption"
+                        }
+                      },
+                      "Property": "adoption_rate"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(adoption.adoption_rate)",
+              "nativeQueryRef": "Sum of adoption_rate"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "adoption"
+                  }
+                },
+                "Property": "week"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Adoption rate, weekly'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

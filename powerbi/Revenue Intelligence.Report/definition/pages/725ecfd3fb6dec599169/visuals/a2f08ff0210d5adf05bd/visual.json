@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "a2f08ff0210d5adf05bd",
+  "position": {
+    "x": 16,
+    "y": 452,
+    "z": 5,
+    "height": 252,
+    "width": 1248,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "stackedAreaChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "consumption_by_tier"
+                    }
+                  },
+                  "Property": "day"
+                }
+              },
+              "queryRef": "consumption_by_tier.day",
+              "nativeQueryRef": "day",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "consumption_by_tier"
+                    }
+                  },
+                  "Property": "primary_tier"
+                }
+              },
+              "queryRef": "consumption_by_tier.primary_tier",
+              "nativeQueryRef": "primary_tier"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "consumption_by_tier"
+                        }
+                      },
+                      "Property": "units"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(consumption_by_tier.units)",
+              "nativeQueryRef": "Sum of units"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "consumption_by_tier"
+                  }
+                },
+                "Property": "day"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Consumption (metered units) by plan tier, daily'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
