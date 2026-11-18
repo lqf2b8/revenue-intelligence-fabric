@@ -1,0 +1,126 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 1004,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 36
+          },
+          "nodeIndex": "arr_monthly_by_tier",
+          "nodeLineageTag": "cb312825-1e80-477e-9885-72849e5e671c",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 284,
+            "y": 12
+          },
+          "nodeIndex": "open_pipeline_weekly",
+          "nodeLineageTag": "3bb02e26-920a-4740-936f-6658cbe8fcc9",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 568,
+            "y": 12
+          },
+          "nodeIndex": "win_rate_by_product",
+          "nodeLineageTag": "dadaa486-cc40-492c-bf2c-11e0412a19a9",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852,
+            "y": 48
+          },
+          "nodeIndex": "active_accounts",
+          "nodeLineageTag": "1035a6ec-59f0-46ec-b655-52a81c849d54",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1136,
+            "y": 24
+          },
+          "nodeIndex": "adoption",
+          "nodeLineageTag": "3fa0ac36-460b-478e-b8f0-be1b905bf03a",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1420,
+            "y": 12
+          },
+          "nodeIndex": "consumption_by_tier",
+          "nodeLineageTag": "7d4c7b38-9c16-4a8c-8bca-4314908e0ce0",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1704,
+            "y": 36
+          },
+          "nodeIndex": "signal_vs_next_month_expansion",
+          "nodeLineageTag": "7d08c919-027c-42a0-9648-a5d410c06bd9",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1988,
+            "y": 0
+          },
+          "nodeIndex": "expansion_signal",
+          "nodeLineageTag": "3f11810e-bbda-48c1-8b95-ed8d00a0352b",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

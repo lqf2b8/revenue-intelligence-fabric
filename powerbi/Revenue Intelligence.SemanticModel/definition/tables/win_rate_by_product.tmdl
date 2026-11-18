@@ -1,0 +1,65 @@
+table win_rate_by_product
+	lineageTag: dadaa486-cc40-492c-bf2c-11e0412a19a9
+
+	measure 'Win rate' =
+			
+			DIVIDE ( SUM ( win_rate_by_product[won] ), SUM ( win_rate_by_product[closed] ) )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 2ede8bc6-f9cd-4274-851d-70625368681b
+
+	column quarter
+		dataType: string
+		lineageTag: b3085cb3-6a55-441a-af9a-3033eb99b946
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: 8d884b5b-511e-4146-87ca-bef4f1380233
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column won
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e9f7d16-f268-4dbf-8ebc-4183c8f9250d
+		summarizeBy: sum
+		sourceColumn: won
+
+		annotation SummarizationSetBy = Automatic
+
+	column closed
+		dataType: int64
+		formatString: 0
+		lineageTag: 3dfd6b10-a9ca-4d77-9dcd-5e5e031a2963
+		summarizeBy: sum
+		sourceColumn: closed
+
+		annotation SummarizationSetBy = Automatic
+
+	column win_rate
+		dataType: double
+		lineageTag: cb7ae2b7-8158-4548-bccf-6ce6b243fb3d
+		summarizeBy: sum
+		sourceColumn: win_rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition win_rate_by_product = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/lqf2b8/revenue-intelligence-fabric/main/data/processed/reference_kpis/win_rate_by_product.csv"),[Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"quarter", type text}, {"product", type text}, {"won", Int64.Type}, {"closed", Int64.Type}, {"win_rate", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,30 @@
+relationship 5c5e7737-8912-4b46-b810-8ef6a15bed40
+	joinOnDateBehavior: datePartOnly
+	fromColumn: arr_monthly_by_tier.date
+	toColumn: LocalDateTable_115e1159-fc13-40f2-b0bd-ebda5e54a603.Date
+
+relationship 7ffabd51-d45b-4fab-8b9c-aed8e3e032d5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: open_pipeline_weekly.as_of
+	toColumn: LocalDateTable_31399dd8-4bc7-4fa5-9e47-90cd4e0b7328.Date
+
+relationship ec1531c5-d885-4109-ac35-b28e4fc2df21
+	joinOnDateBehavior: datePartOnly
+	fromColumn: active_accounts.day
+	toColumn: LocalDateTable_bbf1ff90-16da-46db-a50c-65d59a796b0e.Date
+
+relationship c7499345-b3b0-42f3-a75b-83ecaff2af9b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: adoption.week
+	toColumn: LocalDateTable_8ef11006-65ac-457f-b30a-8b537a5609e8.Date
+
+relationship 2a238288-cac5-4cbf-aee4-561280422d28
+	joinOnDateBehavior: datePartOnly
+	fromColumn: consumption_by_tier.day
+	toColumn: LocalDateTable_0ff02967-22f2-421b-8c26-4e08a79f9328.Date
+
+relationship 607a31bf-265d-4961-ab2d-47e4cebaea8c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: expansion_signal.month_end
+	toColumn: LocalDateTable_96f4cea9-22b9-440d-99b1-bdd1b818c2af.Date
+

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "8d967484d41490920c79",
+  "position": {
+    "x": 16,
+    "y": 180,
+    "z": 4,
+    "height": 260,
+    "width": 620,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "columnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "arr_monthly_by_tier"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "arr_monthly_by_tier.date",
+              "nativeQueryRef": "date",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "arr_monthly_by_tier"
+                    }
+                  },
+                  "Property": "plan_tier"
+                }
+              },
+              "queryRef": "arr_monthly_by_tier.plan_tier",
+              "nativeQueryRef": "plan_tier"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "arr_monthly_by_tier"
+                        }
+                      },
+                      "Property": "arr"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(arr_monthly_by_tier.arr)",
+              "nativeQueryRef": "Sum of arr"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "arr_monthly_by_tier"
+                  }
+                },
+                "Property": "date"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ARR by plan tier, month-end'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
