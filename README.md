@@ -101,7 +101,7 @@ curl "localhost:8000/kpis/active_accounts?start=2017-12-31&end=2017-12-31"
 ANTHROPIC_API_KEY=... docker compose up -d question-api
 curl -X POST localhost:8001/ask -H 'content-type: application/json' \
      -d '{"question": "How did win rate for GTX Pro change across 2017?"}'
-SF_AUTH_URL=... docker compose --profile salesforce run --rm salesforce-loader
+SF_AUTH_URL=... docker compose --profile salesforce run --rm salesforce-loader   # auth URL: see services/salesforce-loader/entrypoint.sh
 ```
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the unit tests, Spark included, then builds

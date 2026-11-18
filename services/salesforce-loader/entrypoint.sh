@@ -1,7 +1,11 @@
 #!/bin/sh
 # Log in to the org from an SFDX auth URL, build the upsert CSVs, run the load.
 # Get the URL once on your machine after `sf org login web --alias revintel`:
-#   sf org display --target-org revintel --verbose --json | jq -r .result.sfdxAuthUrl
+#   sf org auth show-sfdx-auth-url --target-org revintel --json | jq -r .result.sfdxAuthUrl
+# (Salesforce CLI 2.15x+; older versions: sf org display --target-org revintel --verbose --json.)
+# PowerShell:
+#   $u = (sf org auth show-sfdx-auth-url --target-org revintel --json | Out-String | ConvertFrom-Json).result.sfdxAuthUrl
+#   $env:SF_AUTH_URL = $u; docker compose --profile salesforce run --rm salesforce-loader; Remove-Item Env:SF_AUTH_URL
 # Treat it like a password: it grants API access to the org.
 set -eu
 : "${SF_AUTH_URL:?Set SF_AUTH_URL to the org's SFDX auth URL (see the comment in entrypoint.sh)}"
