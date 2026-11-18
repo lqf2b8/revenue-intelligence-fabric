@@ -1,0 +1,7 @@
+# Shell scripts run inside Linux containers. Keep LF endings even when the repo
+# is checked out on Windows (core.autocrlf=true would otherwise write CRLF, and
+# the container then fails with "exec ... no such file or directory").
+*.sh text eol=lf
+services/*/entrypoint.sh text eol=lf
+Dockerfile text eol=lf
+*.kql text eol=lf
